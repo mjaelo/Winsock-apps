@@ -1,0 +1,13 @@
+﻿  widsock_proba.cpp
+d:\studia\sem3\tech siec\lab\widsock_serwer\widsock_proba\widsock_proba.cpp(137): warning C4244: "=": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\widsock_serwer\widsock_proba\widsock_proba.cpp(175): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\widsock_serwer\widsock_proba\widsock_proba.cpp(190): warning C4244: "inicjowanie": konwersja z "double" do "int", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\widsock_serwer\widsock_proba\widsock_proba.cpp(237): warning C4244: "argument": konwersja z "unsigned long" do "_Elem", możliwa utrata danych
+          with
+          [
+              _Elem=char
+          ]
+  Trwa generowanie kodu
+  All 212 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Zakończono generowanie kodu
+  widsock_proba.vcxproj -> D:\studia\sem3\tech siec\lab\widsock_serwer\Release\widsock_proba.exe
