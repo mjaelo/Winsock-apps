@@ -1,7 +1,0 @@
-﻿  widsock_proba.cpp
-d:\studia\sem3\tech siec\lab\widsock_klient\widsock_proba\widsock_proba.cpp(133): warning C4244: "argument": konwersja z "unsigned long" do "_Elem", możliwa utrata danych
-          with
-          [
-              _Elem=char
-          ]
-  widsock_proba.vcxproj -> D:\studia\sem3\tech siec\lab\widsock_klient\Debug\widsock_proba.exe
