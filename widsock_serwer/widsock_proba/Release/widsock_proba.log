@@ -1,0 +1,16 @@
+﻿  widsock_proba.cpp
+d:\studia\sem3\tech siec\lab\7\widsock_serwer\widsock_proba\widsock_proba.cpp(175): warning C4244: "=": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\7\widsock_serwer\widsock_proba\widsock_proba.cpp(199): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\7\widsock_serwer\widsock_proba\widsock_proba.cpp(216): warning C4244: "=": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\7\widsock_serwer\widsock_proba\widsock_proba.cpp(223): warning C4244: "inicjowanie": konwersja z "double" do "int", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\7\widsock_serwer\widsock_proba\widsock_proba.cpp(270): warning C4244: "argument": konwersja z "unsigned long" do "_Elem", możliwa utrata danych
+          with
+          [
+              _Elem=char
+          ]
+  Trwa generowanie kodu
+  1 of 217 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Zakończono generowanie kodu
+  widsock_proba.vcxproj -> D:\studia\sem3\tech siec\lab\7\widsock_serwer\Release\widsock_proba.exe
