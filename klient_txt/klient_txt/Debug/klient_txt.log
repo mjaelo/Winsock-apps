@@ -1,0 +1,8 @@
+﻿  klient_txt.cpp
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(77): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(159): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(243): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(295): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(303): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(281): warning C4101: "a": lokalna zmienna, do której nie istnieje odwołanie
+  klient_txt.vcxproj -> D:\studia\sem3\tech siec\lab\8\klient_txt\Debug\klient_txt.exe
