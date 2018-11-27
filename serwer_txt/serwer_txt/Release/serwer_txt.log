@@ -1,0 +1,15 @@
+﻿  pch.cpp
+  serwer_txt.cpp
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(76): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(125): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(126): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(160): warning C4244: "=": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(173): warning C4244: "=": konwersja z "double" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(192): warning C4244: "=": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(228): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(351): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\serwer_txt\serwer_txt\serwer_txt.cpp(359): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+  Trwa generowanie kodu
+  All 219 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Zakończono generowanie kodu
+  serwer_txt.vcxproj -> D:\studia\sem3\tech siec\lab\8\serwer_txt\Release\serwer_txt.exe

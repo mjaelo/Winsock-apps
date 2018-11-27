@@ -15,7 +15,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <bitset>
+#include <vector>
+#include<time.h>
+
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -25,9 +27,10 @@
 //podawanie danych poczatkowych
 //zmienic liczby na tekst
 //znaczniki czasu
+//dodac operacje do historii
 
 
-#define DEFAULT_BUFLEN 18
+#define DEFAULT_BUFLEN 23
 #define DEFAULT_PORT 27015 //port tcp
 
 
@@ -39,11 +42,11 @@ public:
 	std::string OP = "0";
 	std::string L1 = "0000000000";//otrzymana liczba
 	std::string L2 = "0000000001";//wynik
-	std::string ST = "00";//blad 01= poza zakres, 10= /0, 
+	std::string ST = "0";//blad 1= poza zakres, 2= /0,
 	std::string ID = "001";//losowy numer
-	std::string padding = "00";//czy ostatnie i znak
+	std::string TM = "00:00:00";//czas wyslania
 
-
+	std::vector<std::string> historia;
 
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
@@ -89,22 +92,22 @@ void klient::dekompresja() {
 			L2 = temp;
 			temp = "";
 		}
-		if (i == 10 + 2)
+		if (i == 10 + 1)
 		{
 			std::cout << temp << " ";
 			ST = temp;
 			temp = "";
 		}
-		if (i == 10 + 2 + 3)
+		if (i == 10 + 1 + 3)
 		{
 			std::cout << temp << " ";
 			ID = temp;
 			temp = "";
 		}
-		if (i == 10 + 2 + 3 + 2)
+		if (i == 10 + 1 + 3 + 8)
 		{
 			std::cout << temp << " ";
-			padding = temp;
+			TM = temp;
 			temp = "";
 		}
 
@@ -151,8 +154,35 @@ void klient::connectsocket() {
 
 void klient::sending()
 {
-	// Send a buffer			
-	s = OP+L1+ST+ID+padding;
+	// Send a buffer	
+
+	time_t sec;	sec = time(NULL)+3600;
+	int temp = sec % 60;
+	std::string temo=std::to_string(temp);
+	if (temp > 9) { TM[7] = temo[1];	TM[6] = temo[0]; }
+	else		 { TM[7] = temo[0];	TM[6] = '0'; }
+
+	sec = (sec - temp) / 60;
+	temp = sec % 60;
+	temo = std::to_string(temp);
+	if (temp > 9) { TM[4] = temo[1];	TM[3] = temo[0]; }
+	else		 { TM[4] = temo[0];	TM[3] = '0'; }
+
+	sec = (sec - temp) / 60;
+	temp = sec % 24;
+	temo = std::to_string(temp);
+	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
+	else		  { TM[1] = temo[0];	TM[0] = '0'; }
+
+	std::cout << "czas wyslania: " << TM<<'\n';
+
+
+
+
+
+	ST = "0";
+	s = OP+L1+ST+ID+TM;
+	historia.push_back(OP +" "+ L1 + " " + ST + " " + ID + " " + TM);
 
 	sendbuflen = s.size();
 	char sendb[52];
@@ -163,7 +193,7 @@ void klient::sending()
 
 	iResult = send(ConnectSocket, sendb, sendbuflen, 0);
 	std::cout << "Bytes Sent: " << iResult << "\n";
-	std::cout << "String sent: " << '\n';
+	std::cout << "String sent: " <<s<< '\n';
 
 
 	if (iResult == SOCKET_ERROR) {
@@ -189,8 +219,8 @@ void klient::receive()
 	if (iResult > 0)
 	{
 
-		s = "0123456789012345678";
-		for (int i = 0; i < 18; i++)
+		s = "01234567890123456789012";
+		for (int i = 0; i < iResult; i++)
 			s[i] = recvbuf[i];
 
 		std::cout << "\nreceived data:" << s;
@@ -238,11 +268,11 @@ void klient::cleanup()
 int  main() {
 	klient k;
 
-	std::string t,temp;
-	temp = std::to_string(rand() % 256);
-	for (int i = 0;i < 3 - temp.size();i++)
+	std::string t,tempr;
+	tempr = std::to_string(rand() % 256);
+	for (int i = 0;i < 3 - tempr.size();i++)
 		t += "0";
-	k.ID = t + temp;
+	k.ID = t + tempr;
 
 	
 
@@ -252,17 +282,52 @@ int  main() {
 	if (!k.error)
 		k.connectsocket();
 
+	//pierwona wartosc serwera
+	if(!k.error)
+	{ 
+		std::cout << "\n\n\n";
+	int oke = 1;
+	do {
+		oke = 1;
+		std::cout << "podaj poczatkowa liczbe serwera ";
+		std::cin >> tempr;
+
+		for (auto e : tempr)
+		{
+			if (int(e) < int('0') || int(e) > int('9') || tempr.size() > 10)
+				oke = 0;
+		}
+		if (oke == 1)
+		{
+			long l = std::stoll(tempr);
+			if (oke == 1 && l > 2147483647)
+				oke= 0;
+
+		}
+	} while (oke == 0);
+	std::string tr;
+	for (int i = 0;i < 10 - tempr.size();i++)
+		tr += "0";
+	k.L1 = tr + tempr;
+	k.OP = "=";
+	k.sending();
+}
+
+
+
+
+
 
 
 	int next = 1;
-	while (next != 0 && k.error == false)
+	while (next != 0 && !k.error)
 	{
 		std::cout << "\n\n\n";
 
 		if (!k.error)
 		{
 			int ok = 1;
-			std::cout << "0 ^, 1 log, 2 mnozenie , 3 dzielenie \n";
+			std::cout << " potegowanie ^ , logarytm l, mnozenie * , dzielenie / , historia h \n";
 			do {
 				ok = 1;
 
@@ -270,20 +335,36 @@ int  main() {
 				std::string temp;
 				std::cin >> temp;
 
-				for (auto e : temp)
-					if (int(e) < int('0') || e > int('9'))
-						ok = 0;
+				
+				if (temp == "potegowanie")temp = '^';
+					else if (temp == "logarytm")temp = 'l';
+					else if (temp == "mnozenie") temp = '*';
+					else if (temp == "dzielenie")temp = '/';
+					else if (temp == "historia") temp = 'h';
+					else ok = 0;
+					
 				if (ok == 1)
 					k.OP = temp;
 			} while (ok == 0);
 		}
 
-		int ok = 1; int a;std::string temp;
 
+
+		int ok = 1; int a;std::string temp;
+		if (k.OP == "h")
+		{
+			std::cout << " historia wysylek: \nOP liczba    ST ID  TM\n";
+			for (auto e : k.historia)
+				std::cout << e << " \n";
+			std::cout << "\n ";
+			temp = "0";
+		}
+		else
+		
 		do {
 			ok = 1;
 			printf(" daj liczbe do wyslania ");
-			std::cin >> temp;
+			 std::cin >> temp;
 
 			for (auto e : temp)
 			{
@@ -299,6 +380,7 @@ int  main() {
 			}
 		} while (ok == 0);
 
+	
 		std::string t;
 		for (int i = 0;i < 10-temp.size();i++)
 			t += "0";
@@ -323,12 +405,12 @@ int  main() {
 		if (!k.error)
 			k.sending();
 
-		if (!k.error && k.ST != "00")
+		if (!k.error && k.ST != "0")
 		{
 			std::cout << "ERROR. nie dokonano operacji. TYP BLEDU: ";
-			if (k.ST == "01")
+			if (k.ST == "1")
 				std::cout << "poza zakresem\n";
-			if (k.ST == "10")
+			if (k.ST == "2")
 				std::cout << "podano 0\n";
 		}
 	}

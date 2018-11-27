@@ -14,16 +14,17 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <bitset>
+#include <vector>
+#include<time.h>
+#include "math.h"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma warning(disable:4996) 
 
-//inne operacje
 
 
-#define DEFAULT_BUFLEN 18
+#define DEFAULT_BUFLEN 23
 #define DEFAULT_PORT 27015 //port tcp
 
 
@@ -36,10 +37,11 @@ public:
 	std::string OP = "0";
 	std::string L1 = "0000000000";//otrzymana liczba
 	std::string L2 = "0000000002";//wynik
-	std::string ST = "00";//blad 01= poza zakres, 10= /0, 
+	std::string ST = "0";//blad 1= poza zakres, 2 /0,
 	std::string ID = "001";//losowy numer
-	std::string padding = "00";//czy ostatnie i znak
-
+	std::string TM = "00:00:00";//czas wyslania
+	
+	std::vector<std::string> historia;
 
 	WSADATA wsaData;
 	int iResult;
@@ -86,24 +88,25 @@ void serwer::dekompresja() {
 			L1 = temp;
 			temp = "";
 		}
-		if (i == 10+2)
+		if (i == 10+1)
 		{
 			std::cout << temp << " ";
 			ST = temp;
 			temp = "";
 		}
-		if (i == 10+2+3)
+		if (i == 10+1+3)
 		{
 			std::cout << temp << " ";
 			ID = temp;
 			temp = "";
 		}
-		if (i == 10+2+3+2)
+		if (i == 10 + 1 + 3+8)
 		{
 			std::cout << temp << " ";
-			padding = temp;
+			TM = temp;
 			temp = "";
 		}
+		
 
 	}
 		std::cout << '\n';
@@ -125,12 +128,12 @@ void serwer::operacje_na_danych()
 
 
 	
-	if (OP  == "0") //potegowanie
+	if (OP  == "^") //potegowanie
 	{
 		if (l1 == 0)
 			a = 1;
 		else if (l1 > 32 && l2 > 1)
-			ST = 01;
+			ST = "1";
 		else
 		{
 			long d = std::stoi(L2);
@@ -144,12 +147,12 @@ void serwer::operacje_na_danych()
 					e *= d;
 					if (e > 2147483647 || e < -2147483647)
 					{
-						ST = "01";
+						ST = "1";
 						break;
 					}
 					if (std::to_string(e).size() > 10)
 					{
-						ST = "01";
+						ST = "1";
 						break;
 					}
 				}
@@ -159,49 +162,72 @@ void serwer::operacje_na_danych()
 		
 	}
 
-	if (OP  == "1") //logarytm
+	if (OP  == "l") //logarytm
 	{
-#include "math.h"
+		if (L2 == "0000000000" || L1 == "0000000000")
+			ST = "2";
+		else
+		{ 
 		int x = std::stoi(L2);
 		int base = std::stoi(L1);
 		a = log(x) / log(base);
+		}
 	}
 
-	if (OP == "2") //mnozenie
+	if (OP == "*") //mnozenie
 	{
 
 		if (std::to_string(l1).size() + std::to_string(l2).size() > 10)
-			ST = "01";
+			ST = "1";
 		long long c = stoi(L2);
 		//for(int i=0;i<liczba1.to_ulong();i++)
 		{
 			c *= stoi(L1);
 			if (c > 2147483647 && c < -2147483647)
 			{
-				ST = "01";
+				ST = "1";
 				//break;
 			}
 		}
 		a = c;
 	}
-	if (OP == "3") //dzielenie
+	if (OP == "/") //dzielenie
 	{
 		if (stoi(L1) != 0)
 			a = stoi(L2) / stoi(L1);
 		else
-			ST = "10";
+			ST = "2";
+	}
+
+	if (OP == "h")
+	{
+		std::cout << " historia wysylek: \nOP liczba    ST ID czas\n";
+		for (auto e : historia)
+			std::cout << e << " \n";
+		std::cout << "\n ";
+		
 	}
 
 
-	if (a > 2147483647 && a < -2147483647)
-		ST = "01";
-	if (std::to_string(a).size() > 10)
-		ST = "01";
 
-	if (ST == "00")
+
+
+
+	if (a > 2147483647 && a < -2147483647)
+		ST = "1";
+	if (std::to_string(a).size() > 10)
+		ST = "1";
+
+	if (ST == "0")
 	{
 		std::cout << "\nnowa liczba: " << a << "\n";
 		L2 =std::to_string(a);
+
+		std::string t, temp;
+		temp = L2;
+		for (int i = 0;i < 10 - temp.size();i++)
+			t += "0";
+		L2 = t + temp;
 	}
 	else std::cout << "error\n";
 
@@ -263,8 +289,8 @@ void serwer::receive()
 		//otrzymanie
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
-			s="0123456789012345678";
-			for (int i = 0; i < 18; i++)				
+			s="01234567890123456789012";
+			for (int i = 0; i < iResult; i++)				
 				s[i] = recvbuf[i];
 
 			std::cout << "Otrzymano slowo: \n" << s << '\n';
@@ -295,13 +321,38 @@ void serwer::sending()
 	dekompresja();
 	operacje_na_danych();
 
-	std::string t, temp;
-	temp = L2;
-	for (int i = 0;i < 10 - temp.size();i++)
-		t += "0";
-	L2 = t + temp;
+	time_t sec;	sec = time(NULL) + 3600;
+	int temp = sec % 60;
+	std::string temo = std::to_string(temp);
+	if (temp > 9) { TM[7] = temo[1];	TM[6] = temo[0]; }
+	else { TM[7] = temo[0];	TM[6] = '0'; }
 
-	s = OP + L2 + ST + ID + padding;
+	sec = (sec - temp) / 60;
+	temp = sec % 60;
+	temo = std::to_string(temp);
+	if (temp > 9) { TM[4] = temo[1];	TM[3] = temo[0]; }
+	else { TM[4] = temo[0];	TM[3] = '0'; }
+
+	sec = (sec - temp) / 60;
+	temp = sec % 24;
+	temo = std::to_string(temp);
+	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
+	else { TM[1] = temo[0];	TM[0] = '0'; }
+
+	std::cout << "czas wyslania: " << TM << '\n';
+
+
+
+
+	historia.push_back(OP + " " + L2 + " " + ST + " " + ID+" "+TM);
+
+	std::string t, tempr;
+	tempr = L2;
+	for (int i = 0;i < 10 - tempr.size();i++)
+		t += "0";
+	L2 = t + tempr;
+
+	s = OP + L2 + ST + ID +TM;
 
 	sendbuflen = s.size();
 	char sendb[52];
