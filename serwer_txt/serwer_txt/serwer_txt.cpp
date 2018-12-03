@@ -24,9 +24,12 @@
 
 
 
-#define DEFAULT_BUFLEN 23
+#define DEFAULT_BUFLEN 100
 #define DEFAULT_PORT 27015 //port tcp
-
+//historia serwer i klient moze pytac, id polaczenia = wszystkie komunikaty, liczba = komunikat o danym id.
+//zmienny rozmiar, brak dopelnien zerami
+//string z opisem: Operacja = mnozenie, liczba 
+//operacje i status slownie
 
 class serwer {
 public:
@@ -35,10 +38,10 @@ public:
 
 
 	std::string OP = "0";
-	std::string L1 = "0000000000";//otrzymana liczba
-	std::string L2 = "0000000002";//wynik
+	std::string L1 = "0";//otrzymana liczba
+	std::string L2 = "2";//wynik
 	std::string ST = "0";//blad 1= poza zakres, 2 /0,
-	std::string ID = "001";//losowy numer
+	std::string ID = "1";//losowy numer
 	std::string TM = "00:00:00";//czas wyslania
 	
 	std::vector<std::string> historia;
@@ -64,53 +67,79 @@ public:
 	void receive();
 	void sending();
 	void cleanup();
-
+	void hist();
 	void operacje_na_danych();// zmiana L2
 	void dekompresja();
 
 };
 
-void serwer::dekompresja() {
-	std::cout << "\ndane to ";
-	std::string temp;
-		for (int i = 0;i < s.size();i++)
+
+void serwer::hist() {
+	int l1 = stoi(L1);
+	if(L1==ID)
 	{
-			temp += s[i];
-		if(i==0)
-		{ 
-			std::cout << temp << " ";
-		OP = temp;
-		temp = "";
-		}
-		if (i == 10)
-		{
-			std::cout << temp << " ";
-			L1 = temp;
-			temp = "";
-		}
-		if (i == 10+1)
-		{
-			std::cout << temp << " ";
-			ST = temp;
-			temp = "";
-		}
-		if (i == 10+1+3)
-		{
-			std::cout << temp << " ";
-			ID = temp;
-			temp = "";
-		}
-		if (i == 10 + 1 + 3+8)
-		{
-			std::cout << temp << " ";
-			TM = temp;
-			temp = "";
-		}
+	std::cout << "\n*** historia wysylek: ***\n";
+	for (auto e : historia)
+		std::cout << e << " \n";
+	std::cout << "\n "; 
+	}
+	else if (l1 > historia.size())
+		ST = "1";
+	else 
+	{
+		std::cout << "\n*** wysylka o numerze:"<<l1<<" ***\n"<<historia[l1]<<"\n\n";
+	}
+	
+}
+
+
+void serwer::dekompresja() {
+	std::string temp;
+	//std::cout << "dane ";
+	int zn = 0;int plus = 0;
+	for (int i = 0;i < s.size();i++)
+	{
 		
+		if (s[i] == ',') { zn++;plus = 0; }
+		if (plus == 1)temp += s[i];
+		if (s[i] == ' ')plus = 1;
+		
+		if (s[i]==',') 
+		{
+			if (zn == 1)
+			{
+				//std::cout << temp << " ";
+				OP = temp;
+				temp = "";
+			}
+			if (zn == 2)
+			{
+				//std::cout << temp << " ";
+				L1 = temp;
+				temp = "";
+			}
+			if (zn == 3)
+			{
+				//std::cout << temp << " ";
+				ST = temp;
+				temp = "";
+			}
+			if (zn == 4)
+			{
+				//std::cout << temp << " ";
+				//ID = temp;
+				temp = "";
+			}
+			if (zn == 5)
+			{
+				//std::cout << temp << " ";
+				TM = temp;
+				temp = "";
+			}
+		}
 
 	}
-		std::cout << '\n';
-
+	//std::cout << "\n";
 }
 
 
@@ -128,7 +157,7 @@ void serwer::operacje_na_danych()
 
 
 	
-	if (OP  == "^") //potegowanie
+	if (OP  == "potegowanie") //potegowanie
 	{
 		if (l1 == 0)
 			a = 1;
@@ -162,7 +191,7 @@ void serwer::operacje_na_danych()
 		
 	}
 
-	if (OP  == "l") //logarytm
+	if (OP  == "logarytm") //logarytm
 	{
 		if (L2 == "0000000000" || L1 == "0000000000")
 			ST = "2";
@@ -174,7 +203,7 @@ void serwer::operacje_na_danych()
 		}
 	}
 
-	if (OP == "*") //mnozenie
+	if (OP == "mnozenie") //mnozenie
 	{
 
 		if (std::to_string(l1).size() + std::to_string(l2).size() > 10)
@@ -191,7 +220,8 @@ void serwer::operacje_na_danych()
 		}
 		a = c;
 	}
-	if (OP == "/") //dzielenie
+	
+	if (OP == "dzielenie") //dzielenie
 	{
 		if (stoi(L1) != 0)
 			a = stoi(L2) / stoi(L1);
@@ -199,16 +229,11 @@ void serwer::operacje_na_danych()
 			ST = "2";
 	}
 
-	if (OP == "h")
-	{
-		std::cout << " historia wysylek: \nOP liczba    ST ID czas\n";
-		for (auto e : historia)
-			std::cout << e << " \n";
-		std::cout << "\n ";
-		
-	}
+	if (OP == "historia")
+	{		hist();	}
 
-
+	if (OP == "przyrownanie")
+	{		a = stol(L1);	}
 
 
 
@@ -220,20 +245,12 @@ void serwer::operacje_na_danych()
 
 	if (ST == "0")
 	{
-		std::cout << "\nnowa liczba: " << a << "\n";
+		//std::cout << "\nnowa liczba: " << a << "\n";
 		L2 =std::to_string(a);
-
-		std::string t, temp;
-		temp = L2;
-		for (int i = 0;i < 10 - temp.size();i++)
-			t += "0";
-		L2 = t + temp;
 	}
 	else std::cout << "error\n";
 
 }
-
-
 
 
 void serwer::validation()
@@ -285,16 +302,18 @@ void serwer::receive()
 {
 	// Receive until the peer shuts down the connection
 	do {
-		std::cout << "\n\n\n";
+		
 		//otrzymanie
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
-			s="01234567890123456789012";
+		std::cout << "\n\n\n" << historia.size() << "\n";
+		std::cout << "___________________________________________________________________________________\n";
+			s.resize(DEFAULT_BUFLEN);
 			for (int i = 0; i < iResult; i++)				
 				s[i] = recvbuf[i];
 
-			std::cout << "Otrzymano slowo: \n" << s << '\n';
-			printf("Bytes received: %d\n", iResult);
+			std::cout << "Otrzymane Slowo: \n" << s << '\n';
+			printf("Bytes received: %d", iResult);
 
 			
 			sending();//dawanie danych do przetworzenia i odeslania
@@ -318,6 +337,7 @@ void serwer::receive()
 void serwer::sending()
 {
 	//wysylanie
+	std::cout << "\n";
 	dekompresja();
 	operacje_na_danych();
 
@@ -339,23 +359,17 @@ void serwer::sending()
 	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
 	else { TM[1] = temo[0];	TM[0] = '0'; }
 
-	std::cout << "czas wyslania: " << TM << '\n';
+	//std::cout << "czas wyslania: " << TM << '\n';
 
 
 
 
-	historia.push_back(OP + " " + L2 + " " + ST + " " + ID+" "+TM);
+	s = "operacja: " + OP + ",wynik: " + L2 + ",stan: " + ST + ",id: " + ID + ",czas: " + TM;
+	historia.push_back(s);
 
-	std::string t, tempr;
-	tempr = L2;
-	for (int i = 0;i < 10 - tempr.size();i++)
-		t += "0";
-	L2 = t + tempr;
-
-	s = OP + L2 + ST + ID +TM;
 
 	sendbuflen = s.size();
-	char sendb[52];
+	char sendb[DEFAULT_BUFLEN];
 	for (int i = 0; i < s.size(); i++)
 		sendb[i] = s[i];
 
@@ -368,7 +382,7 @@ void serwer::sending()
 		WSACleanup();
 		error = true;
 	}
-	std::cout << "wyslane slowo: " << s << '\n';
+	std::cout << "\nWyslane Slowo: \n" << s << '\n';
 	printf("Bytes sent: %d\n", iSendResult);
 }
 
@@ -402,6 +416,8 @@ void serwer::cleanup()
 
 int  main() {
 	serwer s;
+	s.ID = std::to_string(rand() % 256);
+
 
 	if (!s.error)
 		s.validation();
@@ -414,6 +430,6 @@ int  main() {
 
 	if (s.error) { std::cout << "error"; }
 
-
+	std::cout << "\n\n\n";
 	return 0;
 }

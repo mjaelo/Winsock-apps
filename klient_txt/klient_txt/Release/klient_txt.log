@@ -1,14 +1,13 @@
-﻿  pch.cpp
-  klient_txt.cpp
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(80): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(189): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(273): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(302): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(309): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(376): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(385): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
-d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(353): warning C4101: "a": lokalna zmienna, do której nie istnieje odwołanie
+﻿  klient_txt.cpp
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(85): warning C4018: ">": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(97): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(211): warning C4018: "<": niezgodność typu ze znakiem/bez znaku
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(311): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(375): warning C4244: "inicjowanie": konwersja z "__int64" do "long", możliwa utrata danych
+d:\studia\sem3\tech siec\lab\8\klient_txt\klient_txt\klient_txt.cpp(362): warning C4101: "a": lokalna zmienna, do której nie istnieje odwołanie
   Trwa generowanie kodu
-  All 255 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  1 of 264 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    3 functions had inline decision re-evaluated but remain unchanged
   Zakończono generowanie kodu
   klient_txt.vcxproj -> D:\studia\sem3\tech siec\lab\8\klient_txt\Release\klient_txt.exe
