@@ -35,7 +35,7 @@ class serwer {
 public:
 
 	bool error = false;
-
+	bool pytanie_sie_o_historie = false;
 
 	std::string OP = "0";
 	std::string L1 = "0";//otrzymana liczba
@@ -79,12 +79,14 @@ void serwer::hist() {
 	if(L1==ID)
 	{
 	std::cout << "\n*** historia wysylek: ***\n";
-	for (auto e : historia)
-		std::cout << e << " \n";
+	for (int e=0;e<historia.size();e++)
+		std::cout << e <<":    "<<historia[e]<< " \n";
 	std::cout << "\n "; 
 	}
 	else if (l1 > historia.size())
-		ST = "1";
+	{
+		ST = "1";std::cout << "\n*** wysylka o numerze: " << l1 << " nie istnieje ***\n\n";
+	}
 	else 
 	{
 		std::cout << "\n*** wysylka o numerze:"<<l1<<" ***\n"<<historia[l1]<<"\n\n";
@@ -341,6 +343,8 @@ void serwer::sending()
 	dekompresja();
 	operacje_na_danych();
 
+
+	//czas wyslania
 	time_t sec;	sec = time(NULL) + 3600;
 	int temp = sec % 60;
 	std::string temo = std::to_string(temp);
@@ -384,6 +388,36 @@ void serwer::sending()
 	}
 	std::cout << "\nWyslane Slowo: \n" << s << '\n';
 	printf("Bytes sent: %d\n", iSendResult);
+
+
+
+	if (pytanie_sie_o_historie)
+	{
+		int ok = 1; int a;std::string temp;
+		printf("chcesz sie pytac o historie? 1-tak, 0-nie ");
+		std::cin >> temp;
+		if (temp == "1")
+		{ 
+			do {
+				ok = 1;
+				printf(" podaj nr polaczenia lub id sesji ");
+				std::cin >> temp;
+
+				for (auto e : temp)
+				{
+					if (int(e) < int('0') || int(e) > int('9') || temp.size() > 3)
+						ok = 0;
+				}
+				if (ok == 1)
+				{
+					long l = std::stoll(temp);
+					if (ok == 1 && l > 2147483647)
+						ok = 0;
+				}
+			} while (ok == 0);
+			L1 = temp;
+			hist();}
+	}
 }
 
 
@@ -413,16 +447,30 @@ void serwer::cleanup()
 }
 
 
-
+#include <random>
 int  main() {
 	serwer s;
-	s.ID = std::to_string(rand() % 256);
 
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int > d(0, 256);
+	s.ID=std::to_string(d(gen));
 
 	if (!s.error)
 		s.validation();
 	if (!s.error)
 		s.connectsocket();
+	if (!s.error)
+	{
+		int ok = 0; std::string temp;
+		do {
+			std::cout << "czy serwer bedzie chcial sie pytac o historie? 1-tak, 0-nie\n";
+			std::cin >> temp;
+			if (temp == "0" || temp == "1")
+				ok = 1;
+		} while (ok == 0);
+		s.pytanie_sie_o_historie = std::stoi(temp);
+	}
 	if (!s.error)
 		s.receive();
 	if (!s.error)

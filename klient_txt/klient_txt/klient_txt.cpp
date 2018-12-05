@@ -43,7 +43,7 @@ public:
 	std::string L1 = "0";//otrzymana liczba
 	std::string L2 = "1";//wynik
 	std::string ST = "0";//blad 1= poza zakres, 2= /0,
-	std::string ID = "1";//losowy numer
+	std::string ID = "0";//losowy numer
 	std::string TM = "00:00:00";//czas wyslania
 
 	std::vector<std::string> historia;
@@ -77,17 +77,20 @@ void klient::hist() {
 	int l1 = stoi(L1);
 	if (L1 == ID)
 	{
-		std::cout << " \n*** historia wysylek: ***\n";
-		for (auto e : historia)
-			std::cout << e << " \n";
+		std::cout << "\n*** historia wysylek: ***\n";
+		for (int e = 0;e < historia.size();e++)
+			std::cout << e << ":    " << historia[e] << " \n";
 		std::cout << "\n ";
 	}
 	else if (l1 > historia.size())
-		ST = "1";
+	{
+		ST = "1";std::cout << "\n*** wysylka o numerze: " << l1 << " nie istnieje ***\n\n";
+	}
 	else
 	{
-		std::cout << "\n*** wysylka o numerze " << l1 << ": ***\n" << historia[l1]<<"\n";
+		std::cout << "\n*** wysylka o numerze:" << l1 << " ***\n" << historia[l1] << "\n\n";
 	}
+
 }
 
 void klient::dekompresja() {
@@ -407,7 +410,7 @@ std::cout << "__________________________________________________________________
 		ok = 0;
 		do {
 			printf("\n1 dalej, 0 koniec ");
-			std::cin >> temp;//to na padding
+			std::cin >> temp;
 			if (temp == "0" || temp == "1")
 				ok = 1;
 		} while (ok == 0);
