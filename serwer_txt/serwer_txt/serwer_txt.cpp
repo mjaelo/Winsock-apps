@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 //#include <windows.h>
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
@@ -16,6 +17,7 @@
 #include <string>
 #include <vector>
 #include<time.h>
+#include<ctime>
 #include "math.h"
 
 // Need to link with Ws2_32.lib
@@ -78,10 +80,10 @@ void serwer::hist() {
 	int l1 = stoi(L1);
 	if(L1==ID)
 	{
-	std::cout << "\n*** historia wysylek: ***\n";
+	std::cout << "\n*** historia wysylek: ***\n"<<
+		"nr    operacja        liczba status id     data i godzina\n";
 	for (int e=0;e<historia.size();e++)
-		std::cout << e <<":    "<<historia[e]<< " \n";
-	std::cout << "\n "; 
+		std::cout << e <<":    "<<historia[e];
 	}
 	else if (l1 > historia.size())
 	{
@@ -102,11 +104,11 @@ void serwer::dekompresja() {
 	for (int i = 0;i < s.size();i++)
 	{
 		
-		if (s[i] == ',') { zn++;plus = 0; }
+		if (s[i] == '$') { zn++;plus = 0; } //koniec wyrazu
 		if (plus == 1)temp += s[i];
-		if (s[i] == ' ')plus = 1;
+		if (s[i] == '=')plus = 1;//koniec opisu 
 		
-		if (s[i]==',') 
+		if (s[i]=='$') 
 		{
 			if (zn == 1)
 			{
@@ -308,13 +310,13 @@ void serwer::receive()
 		//otrzymanie
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 		if (iResult > 0) {
-		std::cout << "\n\n\n" << historia.size() << "\n";
-		std::cout << "___________________________________________________________________________________\n";
+		std::cout << "\n\n\n\n" << historia.size() << "\n";
+		std::cout << "___________________________________________________________________________________\n\n\n";
 			s.resize(DEFAULT_BUFLEN);
 			for (int i = 0; i < iResult; i++)				
 				s[i] = recvbuf[i];
 
-			std::cout << "Otrzymane Slowo: \n" << s << '\n';
+			std::cout << "Otrzymane Slowo: \n" << s;// << '\n';
 			printf("Bytes received: %d", iResult);
 
 			
@@ -335,6 +337,8 @@ void serwer::receive()
 	if (!error)printf("receiving completed\n\n");
 }
 
+		
+	
 
 void serwer::sending()
 {
@@ -363,12 +367,16 @@ void serwer::sending()
 	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
 	else { TM[1] = temo[0];	TM[0] = '0'; }
 
-	//std::cout << "czas wyslania: " << TM << '\n';
+	char czas[26];
+	time_t result = time(NULL);
+		ctime_s(czas, sizeof czas, &result);
+		TM = czas;
+	//std::cout << "czas wyslania: " <<TM << '\n';
 
 
 
 
-	s = "operacja: " + OP + ",wynik: " + L2 + ",stan: " + ST + ",id: " + ID + ",czas: " + TM;
+	s = "OP=" + OP + "$ L2=" + L2 + "$ ST=" + ST + "$ ID=" + ID + "$ TM=" + TM;
 	historia.push_back(s);
 
 
@@ -386,7 +394,7 @@ void serwer::sending()
 		WSACleanup();
 		error = true;
 	}
-	std::cout << "\nWyslane Slowo: \n" << s << '\n';
+	std::cout << "\nWyslane Slowo: \n" << s;// << '\n';
 	printf("Bytes sent: %d\n", iSendResult);
 
 

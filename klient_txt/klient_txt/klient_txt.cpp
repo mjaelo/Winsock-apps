@@ -77,10 +77,10 @@ void klient::hist() {
 	int l1 = stoi(L1);
 	if (L1 == ID)
 	{
-		std::cout << "\n*** historia wysylek: ***\n";
+		std::cout << "\n*** historia wysylek: ***\n"<<
+		"nr    operacja        liczba status id     data i godzina\n";
 		for (int e = 0;e < historia.size();e++)
-			std::cout << e << ":    " << historia[e] << " \n";
-		std::cout << "\n ";
+			std::cout << e << ":    " << historia[e] ;
 	}
 	else if (l1 > historia.size())
 	{
@@ -100,11 +100,11 @@ void klient::dekompresja() {
 	for (int i = 0;i < s.size();i++)
 	{
 
-		if (s[i] == ',') { zn++;plus = 0; }
+		if (s[i] == '$') { zn++;plus = 0; } //koniec wyrazu
 		if (plus == 1)temp += s[i];
-		if (s[i] == ' ')plus = 1;
+		if (s[i] == '=')plus = 1;//koniec opisu 
 
-		if (s[i] == ',')
+		if (s[i] == '$')
 		{
 			if (zn == 1)
 			{
@@ -199,14 +199,16 @@ void klient::sending()
 	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
 	else		  { TM[1] = temo[0];	TM[0] = '0'; }
 
-	std::cout << '\n';
+	char czas[26];
+	time_t result = time(NULL);
+	ctime_s(czas, sizeof czas, &result);
+	TM = czas;
+std::cout << '\n';
 
 
 
-
-
-	ST = "0";
-	s = "operacja: "+OP+",liczba: "+L1+",stan: "+ST+",id: "+ID+",czas: "+TM;
+	ST = "0";		
+	s = "OP=" + OP + "$ L1=" + L1 + "$ ST=" + ST + "$ ID=" + ID + "$ TM=" + TM;
 	historia.push_back(s);
 
 	sendbuflen = s.size();
@@ -217,7 +219,7 @@ void klient::sending()
 
 
 	iResult = send(ConnectSocket, sendb, sendbuflen, 0);
-	std::cout << "Wyslane Slowo: \n" <<s<< '\n';
+	std::cout << "Wyslane Slowo: \n" << s;// << '\n';
 	std::cout << "Bytes Sent: " << iResult << "\n";
 
 	if (iResult == SOCKET_ERROR) {
@@ -247,7 +249,7 @@ void klient::receive()
 			s[i] = recvbuf[i];
 
 		std::cout << "\nOtrzymane Slowo:\n" << s;
-		printf("\nBytes received: %d\n", iResult);
+		printf("Bytes received: %d\n", iResult);
 
 		dekompresja();
 
