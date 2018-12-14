@@ -19,6 +19,7 @@
 #include<time.h>
 #include<ctime>
 #include "math.h"
+#include <random>
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -50,7 +51,7 @@ public:
 
 	WSADATA wsaData;
 	int iResult;
-	std::string s;
+	std::string s;//przesylany komunikat
 
 	SOCKET ListenSocket = INVALID_SOCKET;
 	SOCKET ClientSocket = INVALID_SOCKET;
@@ -83,7 +84,7 @@ void serwer::hist() {
 	std::cout << "\n*** historia wysylek: ***\n"<<
 		"nr    operacja        liczba status id     data i godzina\n";
 	for (int e=0;e<historia.size();e++)
-		std::cout << e <<":    "<<historia[e];
+		std::cout << e <<":    "<<historia[e]<<'\n';
 	}
 	else if (l1 > historia.size())
 	{
@@ -299,6 +300,12 @@ void serwer::connectsocket() {
 	ListenSocket = ClientSocket;
 
 	if (!error)printf("connecting completed\n\n");
+
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int > d(0, 256);
+	ID = std::to_string(d(gen));
 }
 
 
@@ -339,7 +346,6 @@ void serwer::receive()
 
 		
 	
-
 void serwer::sending()
 {
 	//wysylanie
@@ -367,16 +373,22 @@ void serwer::sending()
 	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
 	else { TM[1] = temo[0];	TM[0] = '0'; }
 
+	//czas unixonwy w sec
+	std::time_t resu = std::time(nullptr);
+	//std::cout << std::asctime(std::localtime(&resu))
+		//<< resu << " sekund od Epoch\n";
+	TM = std::to_string(resu);
+
 	char czas[26];
 	time_t result = time(NULL);
 		ctime_s(czas, sizeof czas, &result);
-		TM = czas;
+		//TM = czas;
 	//std::cout << "czas wyslania: " <<TM << '\n';
 
 
 
 
-	s = "OP=" + OP + "$ L2=" + L2 + "$ ST=" + ST + "$ ID=" + ID + "$ TM=" + TM;
+	s = "OP=" + OP + "$L2=" + L2 + "$ST=" + ST + "$ID=" + ID + "$TM=" + TM+'$';
 	historia.push_back(s);
 
 
@@ -394,7 +406,7 @@ void serwer::sending()
 		WSACleanup();
 		error = true;
 	}
-	std::cout << "\nWyslane Slowo: \n" << s;// << '\n';
+	std::cout << "\nWyslane Slowo: \n" << s << '\n';
 	printf("Bytes sent: %d\n", iSendResult);
 
 
@@ -455,14 +467,10 @@ void serwer::cleanup()
 }
 
 
-#include <random>
+
 int  main() {
 	serwer s;
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int > d(0, 256);
-	s.ID=std::to_string(d(gen));
 
 	if (!s.error)
 		s.validation();

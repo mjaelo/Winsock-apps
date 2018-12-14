@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 #include<time.h>
-
+#include<ctime>
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -80,7 +80,7 @@ void klient::hist() {
 		std::cout << "\n*** historia wysylek: ***\n"<<
 		"nr    operacja        liczba status id     data i godzina\n";
 		for (int e = 0;e < historia.size();e++)
-			std::cout << e << ":    " << historia[e] ;
+			std::cout << e << ":    " << historia[e] <<'\n';
 	}
 	else if (l1 > historia.size())
 	{
@@ -180,7 +180,7 @@ void klient::connectsocket() {
 void klient::sending()
 {
 	// Send a buffer	
-
+	//czas od polnocy
 	time_t sec;	sec = time(NULL)+3600;
 	int temp = sec % 60;
 	std::string temo=std::to_string(temp);
@@ -198,17 +198,28 @@ void klient::sending()
 	temo = std::to_string(temp);
 	if (temp > 9) { TM[1] = temo[1];	TM[0] = temo[0]; }
 	else		  { TM[1] = temo[0];	TM[0] = '0'; }
+	
+	//czas unixonwy w sec
+	std::time_t resu = std::time(nullptr);
+	std::cout// << std::asctime(std::localtime(&resu))
+		<< resu << " sekund od Epoch\n";
+	TM=std::to_string(resu);
 
-	char czas[26];
+	/*std::time_t t = std::time(0);  // t is an integer type
+    std::cout << t << " seconds since 01-Jan-1970\n";*/
+	
+
+	//czas unixowy podzielony   ten wysylam
+	/*char czas[26];
 	time_t result = time(NULL);
 	ctime_s(czas, sizeof czas, &result);
 	TM = czas;
-std::cout << '\n';
+std::cout << '\n';*/
 
 
 
 	ST = "0";		
-	s = "OP=" + OP + "$ L1=" + L1 + "$ ST=" + ST + "$ ID=" + ID + "$ TM=" + TM;
+	s = "OP=" + OP + "$L1=" + L1 + "$ST=" + ST + "$ID=" + ID + "$TM=" + TM+"$";
 	historia.push_back(s);
 
 	sendbuflen = s.size();
@@ -219,7 +230,7 @@ std::cout << '\n';
 
 
 	iResult = send(ConnectSocket, sendb, sendbuflen, 0);
-	std::cout << "Wyslane Slowo: \n" << s;// << '\n';
+	std::cout << "Wyslane Slowo: \n" << s << '\n';
 	std::cout << "Bytes Sent: " << iResult << "\n";
 
 	if (iResult == SOCKET_ERROR) {
