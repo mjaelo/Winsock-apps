@@ -1,2 +1,2 @@
 # Winsock-apps
-are projects allowing data exchange with two computers in the same network. One version is for UDP and the second one is for TCP. In both cases client sends data to serwer and asks him to calculate an appropriate result.
+are projects allowing data exchange with two computers in the same network by usun TCP. One version uses text protocol and the second one uses binary protocol. In both cases client sends data to serwer and asks him to calculate an appropriate result.
